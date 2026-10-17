@@ -37,8 +37,10 @@ Policy: **static snapshot, manual pulls.** See docs/ARCHITECTURE.md §9.
   `tools/world/derive-world-delta.py` and verified to reproduce it exactly (0 differing tables).
   Compared with the 0.35 patches: 557 missing quest reward items are fixed, startup errors fell from 1,157 to 390.
   The 390 left are in upstream's own 0.36 DB (for example 7 missing poison/potion spells, 42 missing NPC templates).
-- **Navmeshes are still the 0.35 set (`classic-si-2`).** The 0.36 server changed pathfinding and the zip may carry new
-  meshes; not checked or updated yet. They are at `runtime/server/navmesh/` in the zip.
+- **Navmeshes: set `classic-si-3`, from the v0.36b zip** (`runtime/server/navmesh/`, 106 files, read with the same range
+  requests). The 103 `zone*.nav` files and `seams.json` are byte-identical to the 0.35 set (`classic-si-2`); `pockets.json`
+  changed and `roads.json` is new (read by `Bots/autonomous/AutonomousZoneRoads`; without it long bot walks use Detour only).
+  Stored as one `.xz` per mesh in `world/navmesh/` so unchanged meshes cost nothing in later updates.
   - 0.35 reference: `OfflineDAoC-v0.35b.zip`, SHA-256 `5a1d77df…`, DB SHA-256 `feb4a511…`.
 
 ## OpenDAoC

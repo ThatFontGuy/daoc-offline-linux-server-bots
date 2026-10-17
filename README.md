@@ -24,8 +24,8 @@ Fedora 35+, SteamOS, Arch) and libicu (almost every distro has it). Nothing else
 
 Also: about **6 GB** of free disk space, and internet for the first build (for the build container and tools; the world database and navmeshes are already in the source).
 
-Everything else is in the source, including the world and the navmeshes (`world/navmesh/`, four
-~90 MB parts).
+Everything else is in the source, including the world and the navmeshes (`world/navmesh/`, one
+compressed file per mesh, about 360 MB in all).
 
 ### 1. Get the source
 
@@ -61,7 +61,7 @@ Install the **.NET 10 SDK**, **cmake**, **g++** and **curl** with your package m
 ```
 dist/daoc-server/                              <- the server, ready to start (world and navmeshes installed)
 dist/daoc-server-<version>-linux-x64.tar.gz    <- the server without navmeshes, as one file
-dist/daoc-navmeshes-classic-si-2.tar.xz        <- the navmeshes, as one file
+dist/daoc-navmeshes-classic-si-3.tar.xz        <- the navmeshes, as one file
 ```
 
 To run it on another Linux machine, copy `dist/daoc-server` (or the two archives, then run

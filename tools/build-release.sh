@@ -6,7 +6,7 @@
 # Needs the .NET 10 SDK, cmake, g++ and curl (the build box has them). The result needs none of them:
 # it bundles the .NET runtime, links the pathing library's C++ runtime statically, and contains a
 # fresh Classic + SI world built from the pinned upstream OpenDAoC-Database plus world/patches.
-# Navmeshes come from world/navmesh (installed into dist/daoc-server); no client files are included.
+# Navmeshes come from world/navmesh/*.xz (installed into dist/daoc-server); no client files are included.
 set -euo pipefail
 
 REPO="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
@@ -71,21 +71,13 @@ cp "$REPO/deploy/daoc-server.sh" "$REPO/deploy/daoc-admin" "$REPO/deploy/navmesh
 cp "$REPO/deploy/README-release.md" "$OUT/README.md"
 echo "$VERSION" > "$OUT/VERSION"
 
-# Navmeshes ship in the source as ~90 MB parts (world/navmesh/; under GitHub's 100 MB file limit).
-# Join and verify them, and install them into the folder so dist/daoc-server is ready to start.
+# Navmeshes ship in the source as one small .xz per mesh (world/navmesh/*.xz). Unpack and verify
+# them straight into the folder so dist/daoc-server is ready to start. The separate download
+# archive (dist/daoc-navmeshes-*.tar.xz) is only needed for a release: tools/package-navmeshes.sh.
 echo "== Navmeshes (world/navmesh)"
-navset="daoc-navmeshes-classic-si-2.tar.xz"
-nav="$REPO/dist/$navset"
-want=$(<"$REPO/world/navmesh/$navset.sha256")
-if [[ ! -f $nav || $(sha256sum "$nav" | cut -d' ' -f1) != "$want" ]]; then
-  cat "$REPO/world/navmesh/$navset".part-* > "$nav.tmp"
-  [[ $(sha256sum "$nav.tmp" | cut -d' ' -f1) == "$want" ]] || { echo "build-release: navmesh parts in world/navmesh are damaged" >&2; exit 1; }
-  mv "$nav.tmp" "$nav"
-fi
-cp "$REPO/world/navmesh/$navset.sha256" "$nav.sha256"
-DAOC_HOME="$OUT" "$OUT/navmesh-install.sh" --from-archive "$nav"
+"$REPO/tools/navmesh-unpack.sh" "$OUT/navmesh"
 
-# The server tarball leaves the navmeshes out (they are the separate archive above).
+# The server tarball leaves the navmeshes out (release builds publish them as the separate archive from tools/package-navmeshes.sh).
 tarball="$REPO/dist/daoc-server-$VERSION-linux-x64.tar.gz"
 tar -C "$REPO/dist" --exclude='daoc-server/navmesh' -czf "$tarball" daoc-server
 echo "== Done: $OUT"

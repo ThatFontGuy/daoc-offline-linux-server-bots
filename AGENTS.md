@@ -64,8 +64,9 @@ folder when you need to compare or pull. Its release zips hold the world DB and 
   folder's own directories.
 - **Bots are NPCs pretending to be players** (`GameBot : GameNPC, IGamePlayer`). Core files
   special-case them, so bot changes can touch `GameNPC`, `SpellHandler` and other core files.
-- **Navmeshes are in the source** as `world/navmesh/*.part-*` (four ~90 MB parts, under GitHub's
-  100 MB limit). `build-release.sh` joins, verifies and installs them into `dist/daoc-server`.
+- **Navmeshes are in the source** as one `world/navmesh/<file>.xz` per mesh (git stores unchanged
+  meshes once, so an upstream update adds only the meshes that changed). `build-release.sh` unpacks,
+  verifies and installs them into `dist/daoc-server`. New meshes: `tools/navmesh-stage.sh`.
   Rebuilding replaces `dist/`; play on a copy elsewhere.
 - **`world/patches/200-*.sql` are generated.** Never hand-edit them; add `300-*` files instead
   (docs/RELEASING.md).

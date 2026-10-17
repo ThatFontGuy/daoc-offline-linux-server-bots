@@ -7,40 +7,41 @@
    version comes from `git describe`.
 3. Create a GitHub release and attach:
    - `dist/daoc-server-<version>-linux-x64.tar.gz` (server and world, ~85 MB);
-   - `dist/daoc-navmeshes-classic-si-2.tar.xz` and its `.sha256` (~360 MB), for people who use the
+   - `dist/daoc-navmeshes-classic-si-3.tar.xz` and its `.sha256` (~360 MB; make it with
+     `tools/package-navmeshes.sh`), for people who use the
      release instead of building from source. Upload it once per navmesh set: attach it to every
-     release, or keep a dedicated `navmeshes-classic-si-2` release and link to it.
+     release, or keep a dedicated `navmeshes-classic-si-3` release and link to it.
 
    People building from source don't need this; the navmeshes are in the source
    (`world/navmesh/`).
 4. Put the navmesh download URL in `deploy/release.conf`
-   (`NAVMESH_URL=https://github.com/catastrophic-impact/daoc-offline-linux-server-bots/releases/download/<tag>/daoc-navmeshes-classic-si-2.tar.xz`),
+   (`NAVMESH_URL=https://github.com/catastrophic-impact/daoc-offline-linux-server-bots/releases/download/<tag>/daoc-navmeshes-classic-si-3.tar.xz`),
    commit, and rebuild. `./navmesh-install.sh` with no arguments then downloads it automatically
    when the archive isn't next to the folder.
 
 Never attach or commit a played database, logs, `serverconfig.xml` or `admins.json`.
 `.gitignore` covers `dist/`, `.cache/`, `*.db`, `*.sqlite`, `*.nav` and logs.
 
-## The navmesh archive
+## Navmeshes
+
+The repo carries one compressed file per mesh: `world/navmesh/zone042.nav.xz` and so on, plus
+`seams.json.xz`, `pockets.json.xz` and `roads.json.xz`, listed with their SHA-256 in
+`world/navmesh-manifest.sha256`. Git stores identical files once, so an Offline DAoC release that
+changes 3 meshes adds about 20 MB to the repo, not a whole new archive. The current set is the 103
+meshes plus the three bot data files (zone borders, walled pockets, roads) from Offline DAoC 0.36
+(see `UPSTREAM.md`).
 
 ```bash
-tools/package-navmeshes.sh <folder with zone*.nav>   # verifies against world/navmesh-manifest.sha256
+tools/navmesh-unpack.sh <folder>      # repo -> verified folder (build-release.sh does this)
+tools/navmesh-stage.sh <folder>       # folder of new meshes -> repo; only changed files are recompressed
+tools/package-navmeshes.sh            # repo -> dist/daoc-navmeshes-<set>.tar.xz for a release (~4 min)
 ```
 
-It writes `dist/daoc-navmeshes-classic-si-2.tar.xz` and a `.sha256` (xz, about 4 minutes on a
-Steam Deck), plus the same archive as ~90 MB parts in `world/navmesh/`. Those parts are what the
-source carries: each is under GitHub's 100 MB file limit, so plain git works without LFS. The
-current set is the 103 meshes plus `seams.json` and `pockets.json` (bot zone-border and
-walled-pocket data, read by the server) shipped with Offline DAoC 0.35 (see `UPSTREAM.md`).
-
-**A new navmesh set** (for example, regenerated with `tools/navmesh`):
-1. Bump the set name `classic-si-2` in `tools/package-navmeshes.sh` and
-   `deploy/navmesh-install.sh`.
-2. Regenerate the manifest:
-   `(cd <folder> && sha256sum zone*.nav seams.json pockets.json | LC_ALL=C sort -k2) > world/navmesh-manifest.sha256`
-   (keep a `#` comment header naming the set and its source)
-3. Re-package and publish.
-4. Retest the bots: their route data (`bots/autonomous/data/*.json`) was tuned on the current set.
+**New meshes from an Offline DAoC release:** read them out of the release zip
+(`tools/world/rangezip.py`, folder `runtime/server/navmesh/`), run `tools/navmesh-stage.sh <folder>`,
+`git add world/navmesh world/navmesh-manifest.sha256`, build, retest the bots (their route data,
+`Bots/autonomous/data/*.json`, was tuned on the current set). If the set is a new one, also change
+its name in the manifest header and in `deploy/navmesh-install.sh` (`SET=`) and `release.conf`.
 
 ## The world: upstream database pin and the Offline DAoC delta
 

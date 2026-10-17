@@ -81,7 +81,7 @@ How it works:
   user running the server can administer it; for remote admin, ssh in.
 - `config/admins.json` lists GM and admin account names. It's rewritten by the admin tools and
   applied at start and on first login. You can edit it while the server is stopped.
-- Code: `src/GameServer/admin/` (server side), `src/DaocAdmin` (client), `src/Admin.Protocol`
+- Code: `src/Admin.Host/` (server side), `src/DaocAdmin` (client), `src/Admin.Protocol`
   (shared).
 
 ## Connecting a client

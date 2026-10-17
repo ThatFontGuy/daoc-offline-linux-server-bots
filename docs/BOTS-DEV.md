@@ -2,7 +2,7 @@
 
 Everything needed to change how bots behave: what kinds exist, how they live, where the code is,
 how to iterate quickly, and where the design is going. All bot code is in
-`src/GameServer/bots/` (C#).
+`src/Bots/` (C#, compiled into GameServer).
 
 ## 1. Three kinds of characters (never mix them up)
 
@@ -95,7 +95,7 @@ Do this inside the build box (`distrobox enter daoc-server-box`), where the .NET
    cp dist/daoc-navmeshes-classic-si-2.tar.xz* ~/next-test/ && ~/next-test/daoc-server/navmesh-install.sh
    ```
    On this Steam Deck that folder already exists: `~/boxes/daoc-server-box-home/next-test/daoc-server`.
-2. **Edit** code under `src/GameServer/bots/`.
+2. **Edit** code under `src/Bots/`.
 3. **Deploy:** `tools/dev-deploy.sh ~/next-test/daoc-server`. It rebuilds the server DLLs (about
    15 s), copies them into `bin/`, and restarts the server if it was running. The world, bots and
    accounts are untouched.
@@ -112,7 +112,7 @@ Do this inside the build box (`distrobox enter daoc-server-box`), where the .NET
 Only `GameServer.dll` and friends are swapped. A change to `CoreServer`, `DaocAdmin` or packages
 needs a full `tools/build-release.sh`.
 
-## 6. Where things live (`src/GameServer/bots/`)
+## 6. Where things live (`src/Bots/`)
 
 | What you want to change | Where |
 |---|---|
@@ -131,7 +131,7 @@ needs a full `tools/build-release.sh`.
 | Chat | `autonomous/AutonomousBotChat*.cs`, `AutonomousChatIntentModel.cs`, `AutonomousChatKnowledge.cs`, `autonomous/RealmEventBanter.cs` |
 | Economy: Realm Exchange, selling | `autonomous/AutonomousBotEconomy.cs`, `AutonomousAuctionValuation.cs`, `AutonomousSupplyMerchantSpace.cs` |
 | Population and logins | `autonomous/AutonomousPopulationController.cs`, `AutonomousPopulationProperties.cs`, `AutonomousPopulationRamp.cs`, `AutonomousRealmLoginBalancer.cs` |
-| Admin operations | `GameServer/admin/BotRosterAdmin.cs` |
+| Admin operations | `Admin.Host/BotRosterAdmin.cs` |
 
 ## 7. Conventions
 

@@ -47,6 +47,7 @@
         <PackageReference Include="Microsoft.AspNetCore.SpaServices.Extensions" Version="10.0.3" />
         <PackageReference Include="System.ServiceProcess.ServiceController" Version="10.0.3" />
         <ProjectReference Include="..\GameServer\GameServer.csproj" Name="GameServer" />
+        <ProjectReference Include="..\Admin.Host\Admin.Host.csproj" Name="Admin.Host" />
         <Content Include=".\config\serverconfig.xml">
             <CopyToOutputDirectory>Always</CopyToOutputDirectory>
         </Content>

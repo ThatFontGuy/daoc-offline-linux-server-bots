@@ -53,6 +53,11 @@ namespace DOL.GS.PacketHandler.Client.v168
 		private static readonly Logger Log = LoggerManager.Create(MethodBase.GetCurrentMethod().DeclaringType);
 
 		private static DateTime _lastAccountCreateTime;
+
+		/// <summary>
+		/// Privilege level for a newly created account. Set by the admin module (Admin.Host); null means player.
+		/// </summary>
+		public static Func<string, uint> NewAccountPrivLevelProvider { get; set; }
 		private static HttpClient _httpClient = new();
 		private static HashSet<string> _clientsLoggingIn = new();
 		private static Lock _lock = new();
@@ -351,7 +356,7 @@ namespace DOL.GS.PacketHandler.Client.v168
 						playerAccount.LastClientVersion = ((int) client.Version).ToString();
 						playerAccount.Language = Properties.SERV_LANGUAGE;
 						// GM/admin roles listed in config/admins.json apply from the first login.
-						playerAccount.PrivLevel = DOL.GS.Admin.AdminAccountRoles.PrivLevelForNewAccount(username);
+						playerAccount.PrivLevel = NewAccountPrivLevelProvider?.Invoke(username) ?? 1;
 
 						if (Log.IsInfoEnabled)
 							Log.Info("New account created: " + username);

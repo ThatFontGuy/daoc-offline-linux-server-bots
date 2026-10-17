@@ -11,6 +11,7 @@ doc for your task:
 | Running, admin, upgrades, troubleshooting | [docs/RUN.md](docs/RUN.md) |
 | Releases, navmesh set, world data, DB pin | [docs/RELEASING.md](docs/RELEASING.md) |
 | Upstream pins | [UPSTREAM.md](UPSTREAM.md) |
+| Taking upstream changes, module boundaries | [docs/UPSTREAM-SYNC.md](docs/UPSTREAM-SYNC.md) |
 | Why things are the way they are | [docs/history/](docs/history/) |
 
 ## What this is

@@ -83,6 +83,7 @@ namespace DOL.DOLServer.Actions
                 }
             }
 
+            AdminHost.Register();
             GameServer.CreateInstance(config);
             bool started = StartServer();
 

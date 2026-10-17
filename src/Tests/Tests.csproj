@@ -41,6 +41,7 @@
         <ProjectReference Include="..\CoreDatabase\CoreDatabase.csproj" Name="CoreDatabase" />
         <ProjectReference Include="..\CoreServer\CoreServer.csproj" Name="CoreServer" />
         <ProjectReference Include="..\GameServer\GameServer.csproj" Name="GameServer" />
+        <ProjectReference Include="..\Admin.Host\Admin.Host.csproj" Name="Admin.Host" />
         <ProjectReference Include="..\WorldBuilder\WorldBuilder.csproj" Name="WorldBuilder" />
     </ItemGroup>
     <ItemGroup>

@@ -55,14 +55,14 @@
         <PackageReference Include="System.Text.RegularExpressions" Version="4.3.1" />
         <ProjectReference Include="..\CoreBase\CoreBase.csproj" Name="CoreBase" />
         <ProjectReference Include="..\CoreDatabase\CoreDatabase.csproj" Name="CoreDatabase" />
-        <ProjectReference Include="..\Admin.Protocol\Admin.Protocol.csproj" Name="Admin.Protocol" />
+        <Compile Include="..\Bots\**\*.cs" LinkBase="bots" />
         <EmbeddedResource Include=".\config\*" />
-        <EmbeddedResource Include=".\bots\autonomous\data\capnbry_classic_si_goals.json" />
-        <EmbeddedResource Include=".\bots\autonomous\data\classic165_restored_spawn_ids.txt" />
-        <EmbeddedResource Include=".\bots\autonomous\data\classic165_period_restored_spawn_ids.txt" />
-        <EmbeddedResource Include=".\bots\autonomous\data\dungeon_navigation_points.json" />
-        <EmbeddedResource Include=".\bots\autonomous\data\darkness_falls_raid_event_mobs.json" />
-        <EmbeddedResource Include=".\bots\autonomous\data\darkness_falls_navigation_proofs.json" />
+        <EmbeddedResource Include="..\Bots\autonomous\data\capnbry_classic_si_goals.json" />
+        <EmbeddedResource Include="..\Bots\autonomous\data\classic165_restored_spawn_ids.txt" />
+        <EmbeddedResource Include="..\Bots\autonomous\data\classic165_period_restored_spawn_ids.txt" />
+        <EmbeddedResource Include="..\Bots\autonomous\data\dungeon_navigation_points.json" />
+        <EmbeddedResource Include="..\Bots\autonomous\data\darkness_falls_raid_event_mobs.json" />
+        <EmbeddedResource Include="..\Bots\autonomous\data\darkness_falls_navigation_proofs.json" />
         <TranslationFiles Include=".\language\**\*.txt" />
         <APIDocs Include=".\API\docs\*" />
         <Content Include="API\docs\index.css" />

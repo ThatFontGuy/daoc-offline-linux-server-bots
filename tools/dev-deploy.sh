@@ -30,7 +30,7 @@ if [[ $("$DEST/daoc-server.sh" status) == running* ]]; then
 fi
 
 echo "== Copying into $DEST/bin"
-for name in GameServer CoreBase CoreDatabase Admin.Protocol; do
+for name in GameServer CoreBase CoreDatabase Admin.Protocol Admin.Host; do
   for ext in dll pdb; do
     src="$REPO/src/Release/lib/$name.$ext"
     [[ -f $src ]] && cp -f "$src" "$DEST/bin/"

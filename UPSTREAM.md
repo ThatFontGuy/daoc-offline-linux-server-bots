@@ -5,7 +5,7 @@ Policy: **static snapshot, manual pulls.** See docs/ARCHITECTURE.md §9.
 ## Offline DAoC (direct parent)
 
 - Upstream: https://github.com/shadowofze/OfflineDAoC (has git history and release tags).
-- Our `src/` = upstream `source/server/` (`GameServer`, `CoreBase`, `CoreDatabase`, `CoreServer`,
+- Our `src/` = upstream `source/server/` (`GameServer` with its `bots/` folder at `src/Bots`, `CoreBase`, `CoreDatabase`, `CoreServer`,
   `Pathing`, `Tests`, `sharedModules`) plus our own changes.
 - Original fork point: upstream **`08ebffe`** (2026-10-01, between v0.33 and v0.34). Found by matching
   blobs: 3,214 of our 3,228 files were identical to it.
@@ -21,8 +21,7 @@ Policy: **static snapshot, manual pulls.** See docs/ARCHITECTURE.md §9.
   autonomous bot logic (`bots/autonomous/AutonomousArmyPush`, `ZoneRoads`, ...). Not imported: client, launcher, release
   scripts and `tools/`. Sluaghbinder additions (`CripplingPlague`) came along because they are woven into shared enums;
   they stay off via `classes / enable_sluaghbinder = False`.
-- Next pull: `git diff d88b7b2 <new tag> -- source/server/GameServer source/server/CoreServer source/server/Tests`,
-  then `git apply -p3 --directory=src`. Our own changes on top are small: `GameServer/admin/`,
+- Next pull: `tools/upstream/sync.sh offlinedaoc report|check|apply <tag>` (docs/UPSTREAM-SYNC.md). Our own changes on top are small: `Admin.Host/`,
   `DaocAdmin/`, `Admin.Protocol/`, `WorldBuilder/`, population settings, login handler, console
   host, the csproj files and `Pathing/Detour/CMakeLists.txt`.
 - The Sluaghbinder ("b" edition) code stays in, switched off by `classes / enable_sluaghbinder = False`,

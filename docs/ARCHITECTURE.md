@@ -65,7 +65,7 @@ project, not routine. See [UPSTREAM.md](../UPSTREAM.md).
 - **Stopping always saves:** the TUI's Stop button, `daoc-admin server stop`, typing `exit`,
   Ctrl+C and SIGTERM all go through the same path.
 - **Admin plane:**
-  - `GameServer/admin/AdminSocketHost` listens on `run/admin.sock` (mode 0600, no network port).
+  - `Admin.Host/AdminSocketHost` listens on `run/admin.sock` (mode 0600, no network port).
   - `AdminService` implements every operation: status, accounts and roles, bots, population,
     stop.
   - The server console accepts the same commands.

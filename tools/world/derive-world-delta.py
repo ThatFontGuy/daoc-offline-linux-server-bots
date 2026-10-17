@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Derive world/patches from an Offline DAoC release's pristine world (currently 0.35).
+"""Derive world/patches from an Offline DAoC release's pristine world (currently 0.36).
 
 Developer-only and run once per world update; the generated patches are committed, so users never
 need the release. The build applies them on top of the pinned upstream OpenDAoC-Database to recreate
@@ -17,7 +17,7 @@ import pathlib
 import sqlite3
 import sys
 
-WORLD = "Offline DAoC 0.35"  # the release the pristine DB comes from; named in each patch header
+WORLD = "Offline DAoC 0.36"  # the release the pristine DB comes from; named in each patch header
 
 src_path, upstream_path, out = sys.argv[1], sys.argv[2], pathlib.Path(sys.argv[3])
 

@@ -47,7 +47,7 @@ walled-pocket data, read by the server) shipped with Offline DAoC 0.35 (see `UPS
 - `tools/fetch-upstream-db.sh` pins OpenDAoC-Database (`DB_COMMIT`) and a content hash over its
   `.sql` files (`DB_CONTENT_SHA256`, independent of GitHub's archive compression).
 - `world/patches/200-*.sql` are **generated**. Don't edit them by hand. They turn that upstream
-  dump into the pristine world of the Offline DAoC release we track (0.35, plain edition).
+  dump into the pristine world of the Offline DAoC release we track (0.36, plain edition).
 - `world/patches/300-*.sql` are **hand-written** changes on top (for example
   `300-bot-login-speed.sql`). Add new world changes here, with a comment explaining why.
 
@@ -62,7 +62,9 @@ a new release, skip step 1):
    `dotnet src/WorldBuilder/bin/Release/net10.0/DaocWorldBuilder.dll --source <dump> --out /tmp/upstream.sqlite`
 3. Regenerate the delta. You need the release's pristine plain-edition world DB:
    `editions/<version>-no-custom-class/runtime/data/opendaoc.sqlite3.db` inside the "b" release zip
-   (for 0.35: SHA-256 `feb4a511…`, also listed in the plain release's `download-manifest.json`).
+   (for 0.36: SHA-256 `4fdb7ca4…`, also listed in the plain release's `download-manifest.json`).
+   The zip is split in parts, so read the one file with HTTP range requests rather than downloading
+   it all (see `tools/world/rangezip.py`).
    Set `WORLD` at the top of the script to the release, then
    `python3 tools/world/derive-world-delta.py <pristine db> /tmp/upstream.sqlite world/patches`
    (it removes nothing itself: delete the old `200-*` files first). Check the script's `EXCLUDED`

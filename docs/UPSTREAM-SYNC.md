@@ -35,8 +35,8 @@ tools/upstream/sync.sh offlinedaoc apply  v0.37     # needs a clean tree; leaves
 changes most upstream and that we edit least, so a bots-only sync is the common, safe case.
 
 Then: build and test (docs/BUILD.md), resolve `.rej` files, run `bot-touchpoints.sh` against the
-changed files, update `UPSTREAM.md` and `offlinedaoc_SYNCED` in `tools/upstream/upstreams.conf`
-(same commit). Upstream tags can share a commit (v0.36, v0.36b and v0.36c are one), so record the sha.
+changed files, update `UPSTREAM.md`, `offlinedaoc_SYNCED` in `tools/upstream/upstreams.conf` and
+`AdminService.OfflineDaocVersion` (the version the TUI shows), all in the same commit. Upstream tags can share a commit (v0.36, v0.36b and v0.36c are one), so record the sha.
 
 Conflicts in `src/Bots` mean we edited upstream bot code. Prefer moving our change out into a new
 file in `src/Bots/` (a policy class, a partial) so the upstream file can be replaced as-is.

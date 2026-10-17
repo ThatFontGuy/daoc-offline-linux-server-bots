@@ -89,13 +89,16 @@ namespace DOL.GS.Admin
             return "stopping";
         }
 
+        /// <summary>The Offline DAoC release this server code and world track. Bump with every sync (docs/UPSTREAM-SYNC.md).</summary>
+        public const string OfflineDaocVersion = "0.36";
+
         private static ServerStatus Status()
         {
             PopulationInfo population = BotRosterAdmin.Population();
             return new ServerStatus(
                 GameServer.Instance.Configuration.ServerName,
                 typeof(GameServer).Assembly.GetName().Version?.ToString() ?? "unknown",
-                ServerProperties.Properties.ENABLE_SLUAGHBINDER ? "0.35b" : "0.35",
+                ServerProperties.Properties.ENABLE_SLUAGHBINDER ? OfflineDaocVersion + "b" : OfflineDaocVersion,
                 (long)(DateTime.Now - Process.GetCurrentProcess().StartTime).TotalSeconds,
                 HumanClients().Count(c => c.ClientState == GameClient.eClientState.Playing),
                 population.Online,

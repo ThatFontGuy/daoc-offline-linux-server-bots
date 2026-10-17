@@ -12,7 +12,7 @@ doc for your task:
 | Releases, navmesh set, world data, DB pin | [docs/RELEASING.md](docs/RELEASING.md) |
 | Upstream pins | [UPSTREAM.md](UPSTREAM.md) |
 | Taking upstream changes, module boundaries | [docs/UPSTREAM-SYNC.md](docs/UPSTREAM-SYNC.md) |
-| Why things are the way they are | [docs/history/](docs/history/) |
+| Why things are the way they are | [docs/history/](docs/history/). Before an upstream sync, read [the 0.36 sync notes](docs/history/2026-10-17-sync-to-0.36.md) |
 
 ## What this is
 
@@ -44,6 +44,7 @@ folder when you need to compare or pull. Its release zips hold the world DB and 
   `flatpak-spawn --host distrobox enter daoc-server-box -- bash -lc '...'`. The sandbox `/tmp` is
   private; put shared files under the box home.
 - **No git identity is set globally;** the repo has a local one (catastrophic-impact noreply).
+- **Healthy startup logs ~390 ERR.** It is upstream's own data (see the 0.36 sync notes); watch for changes, not the number.
 - **Common commands** (inside the box, from the repo root):
   - Build and test: `cd src && ~/.dotnet/dotnet build DaocServer.sln -c Release && ~/.dotnet/dotnet test Tests/Tests.csproj -c Release --no-build`
   - Full release: `tools/build-release.sh`. About 3 minutes; creates `dist/daoc-server`.

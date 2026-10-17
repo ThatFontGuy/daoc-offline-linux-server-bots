@@ -14,7 +14,14 @@ Policy: **static snapshot, manual pulls.** See docs/ARCHITECTURE.md §9.
   Not imported: `source/server/tools/` (Windows client patchers and navmesh analysis scripts).
   - `CoreServer/Actions/ConsoleStart.cs`: kept ours. Upstream `c1c465c` (PR #3) backs off on stdin
     EOF; our console thread already stops reading at EOF.
-- Next pull: `git diff d337d18 <new tag> -- source/server/GameServer source/server/CoreServer source/server/Tests`,
+- **Synced to v0.36 (`d88b7b2`, 2026-10-16).** v0.36, v0.36b and v0.36c are the same commit; the editions differ only in
+  release packaging, which we don't import. Applied `d337d18..d88b7b2` for `source/server/{GameServer,CoreServer,CoreBase,
+  CoreDatabase,Pathing,sharedModules,Tests}` with `git apply -p3 --directory=src` (clean, no conflicts). Includes the
+  save-snapshot memory-leak fix (`CoreDatabase/DataObject.cs`, `UT_DataObjectSnapshot`), dead-pet cleanup, and the new
+  autonomous bot logic (`bots/autonomous/AutonomousArmyPush`, `ZoneRoads`, ...). Not imported: client, launcher, release
+  scripts and `tools/`. Sluaghbinder additions (`CripplingPlague`) came along because they are woven into shared enums;
+  they stay off via `classes / enable_sluaghbinder = False`.
+- Next pull: `git diff d88b7b2 <new tag> -- source/server/GameServer source/server/CoreServer source/server/Tests`,
   then `git apply -p3 --directory=src`. Our own changes on top are small: `GameServer/admin/`,
   `DaocAdmin/`, `Admin.Protocol/`, `WorldBuilder/`, population settings, login handler, console
   host, the csproj files and `Pathing/Detour/CMakeLists.txt`.

@@ -7,7 +7,7 @@ set -euo pipefail
 # Pinned in UPSTREAM.md. The content hash covers the .sql files themselves (sorted
 # "sha256  name" lines), so it does not depend on how GitHub compresses its archives.
 DB_COMMIT="98738ab8495f7e0a17412318e7c7c32a96d0eb09"
-DB_CONTENT_SHA256="b7eac59767611f82165e04c2ecc1b535004ca3d8d8a98f96ba3a6f4f1b8d40d9"
+DB_CONTENT_SHA256="82be1a5b46e309a3edb80740e0cb3097003423be0d9f407cd35c94650f21979d"
 
 REPO="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 CACHE="$REPO/.cache/opendaoc-db-$DB_COMMIT"

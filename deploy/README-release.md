@@ -9,14 +9,15 @@ Requirements: x86-64 Linux with glibc 2.34 or newer (Ubuntu 22.04+, Debian 12+, 
 ## 1. Install navmeshes (once)
 
 Navmeshes let NPCs and bots walk around obstacles. The world itself is built in: a fresh
-Classic + Shrouded Isles world (the Offline DAoC 0.35 world) is created on first start.
-
-Download `daoc-navmeshes-classic-si-4.tar.xz` (~360 MB) from the release page, put it next to the
-server folder, and run:
+Classic + Shrouded Isles world (the Offline DAoC 0.37 world) is created on first start.
 
 ```bash
 ./navmesh-install.sh
 ```
+
+With no navmesh archive next to this folder, it downloads one (~360 MB) automatically. To install
+offline, or to skip the download, get `daoc-navmeshes-classic-si-4.tar.xz` from the release page
+yourself, put it next to this folder, and run the command above.
 
 The navmeshes are verified file by file. Alternatives: `--from-archive <file>`, or
 `--from-dir <folder>` to reuse another server's `zone*.nav`.
@@ -68,9 +69,39 @@ Notes:
 
 ## 3. Connect
 
-The client is installed separately. Point it at this machine on port 10300. For players on
-other machines, set `<RegionIP>` in `config/serverconfig.xml` to this machine's LAN address
-(or your public address when port-forwarding TCP 10300 and UDP 10400).
+The game client is a separate install (not part of this project). Get it from
+[shadowofze/OfflineDAoC](https://github.com/shadowofze/OfflineDAoC/releases) — download the
+release matching this server's world version (shown in `./daoc-admin status`, for example `0.37`
+or `0.37b` for the Sluaghbinder). Use its downloader to install the client; **don't** use its
+launcher's "START SERVER" button — that starts its own separate local server, not this one. Instead,
+point the client straight at this machine:
+
+**Windows, the original client (the file names below are inside the installed game folder):**
+```
+connect.exe game.dll <this machine's address> <account> <password>
+```
+No launcher, no Wine, run it directly in a Command Prompt from that folder.
+
+**Linux or macOS, the original client, via Wine:**
+```bash
+wine connect.exe game.dll <this machine's address> <account> <password>
+```
+
+**The new Godot client (0.37c, BETA):** it speaks the same protocol and takes the same kind of
+argument. Instead of its launcher, run the client executable directly with
+`--server=<this machine's address> --account=<account>` and its own password flag (same `--name=value` style; see
+[shadowofze/OfflineDAoC docs/NEW-CLIENT.md](https://github.com/shadowofze/OfflineDAoC/blob/main/docs/NEW-CLIENT.md)
+for where that executable is inside its install). Windows only for now; it's built on Godot 4,
+which is cross-platform, so a native macOS/Linux build is a plausible future addition, not done
+yet.
+
+Accounts are created on first login, or with `./daoc-admin accounts create <name> <password>`.
+Make one an admin from the **Accounts** tab or `./daoc-admin accounts set-role <account> admin`.
+
+**For players on other machines:** set `<RegionIP>` in `config/serverconfig.xml` to this machine's
+LAN address (for example `192.168.1.20`), or its public address if you're forwarding ports, then
+restart the server. Forward **TCP 10300** and **UDP 10400** on your router to let in players from
+outside your network.
 
 Accounts are created on first login, or with `./daoc-admin accounts create <name> <password>`.
 

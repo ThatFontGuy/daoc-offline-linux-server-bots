@@ -42,6 +42,14 @@ Policy: **static snapshot, manual pulls.** See docs/ARCHITECTURE.md §9.
 - **World: v0.36 (plain edition).** The plain DB is `OfflineDAoC-v0.36b/editions/0.36-no-custom-class/runtime/data/opendaoc.sqlite3.db`
   inside `OfflineDAoC-v0.36b.zip.001-.003` (SHA-256 `4fdb7ca4…`, matching the v0.36 `download-manifest.json`). It was
   read straight out of the split zip with HTTP range requests (about 30 MB transferred of 4.8 GB).
+- **World: v0.37.** Upstream's 0.37 release ships as an update-only patch (no full world DB zip this time):
+  `OfflineDAoC-v0.37-game-patch.zip` (SHA-256 `48fd6482…`, matching `download-manifest.json`) contains
+  `db-0.37.json` (SHA-256 `edce0000…`), a structured row-level delta from the 0.36 world (`Insert`/`Update`/`Delete`
+  per table, keyed by each table's primary key). Applied with `tools/world/apply-release-db-delta.py` to our
+  pristine 0.36 world, verifying every `Update`'s "Old" row matched our DB exactly before writing (0 mismatches):
+  DataQuest +0/~3, ItemTemplate +0/~22, Mob +4/~238, Path +1/~0, PathPoints +11/~0. Also adds one new table,
+  `offline_world_bot_guild` (bot guild membership), already created by our own `Bots/autonomous/AutonomousBotGuilds.cs`
+  `DataObject` - no row data needed, it starts empty (added to `derive-world-delta.py`'s `EXCLUDED` progress-table list).
 - `world/patches/200-*.sql` turn the OpenDAoC-Database dump (below) into that DB's world. They were regenerated with
   `tools/world/derive-world-delta.py` and verified to reproduce it exactly (0 differing tables).
   Compared with the 0.35 patches: 557 missing quest reward items are fixed, startup errors fell from 1,157 to 390.
@@ -51,6 +59,8 @@ Policy: **static snapshot, manual pulls.** See docs/ARCHITECTURE.md §9.
   changed and `roads.json` is new (read by `Bots/autonomous/AutonomousZoneRoads`; without it long bot walks use Detour only).
   Stored as one `.xz` per mesh in `world/navmesh/` so unchanged meshes cost nothing in later updates.
   - 0.35 reference: `OfflineDAoC-v0.35b.zip`, SHA-256 `5a1d77df…`, DB SHA-256 `feb4a511…`.
+- **Navmeshes: set `classic-si-4`, from the v0.37 game patch.** Only `pockets.json` changed (walled-pocket fixes);
+  the 103 `zone*.nav` files, `seams.json` and `roads.json` are byte-identical to `classic-si-3` (0.36).
 
 ## OpenDAoC
 

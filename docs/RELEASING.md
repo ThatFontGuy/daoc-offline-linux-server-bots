@@ -7,15 +7,15 @@
    version comes from `git describe`.
 3. Create a GitHub release and attach:
    - `dist/daoc-server-<version>-linux-x64.tar.gz` (server and world, ~85 MB);
-   - `dist/daoc-navmeshes-classic-si-3.tar.xz` and its `.sha256` (~360 MB; make it with
+   - `dist/daoc-navmeshes-classic-si-4.tar.xz` and its `.sha256` (~360 MB; make it with
      `tools/package-navmeshes.sh`), for people who use the
      release instead of building from source. Upload it once per navmesh set: attach it to every
-     release, or keep a dedicated `navmeshes-classic-si-3` release and link to it.
+     release, or keep a dedicated `navmeshes-classic-si-4` release and link to it.
 
    People building from source don't need this; the navmeshes are in the source
    (`world/navmesh/`).
 4. Put the navmesh download URL in `deploy/release.conf`
-   (`NAVMESH_URL=https://github.com/catastrophic-impact/daoc-offline-linux-server-bots/releases/download/<tag>/daoc-navmeshes-classic-si-3.tar.xz`),
+   (`NAVMESH_URL=https://github.com/catastrophic-impact/daoc-offline-linux-server-bots/releases/download/<tag>/daoc-navmeshes-classic-si-4.tar.xz`),
    commit, and rebuild. `./navmesh-install.sh` with no arguments then downloads it automatically
    when the archive isn't next to the folder.
 
@@ -66,6 +66,18 @@ a new release, skip step 1):
    (for 0.36: SHA-256 `4fdb7ca4…`, also listed in the plain release's `download-manifest.json`).
    The zip is split in parts, so read the one file with HTTP range requests rather than downloading
    it all (see `tools/world/rangezip.py`).
+
+   **Starting with 0.37, upstream ships world changes as a patch instead** (check the release's
+   `download-manifest.json`: `"Mode": "patch"` means there is no full DB to range-read). Its
+   game-patch zip has `db-<version>.json`: a row-level delta (`Insert`/`Update`/`Delete` per table,
+   keyed by primary key) from the prior release's world. Apply it to the *previous* release's
+   pristine DB instead of reading a new one out of a zip:
+   `python3 tools/world/apply-release-db-delta.py db-<version>.json <previous pristine db> <pristine db>`
+   (it verifies every `Update`'s "Old" row against the input DB first and refuses to continue
+   silently if anything doesn't match). A `NewTables` entry is schema-only (no rows) and needs a
+   matching `DataObject` on our side already; the script checks this.
+
+   Either way, once you have the release's pristine plain-edition world DB:
    Set `WORLD` at the top of the script to the release, then
    `python3 tools/world/derive-world-delta.py <pristine db> /tmp/upstream.sqlite world/patches`
    (it removes nothing itself: delete the old `200-*` files first). Check the script's `EXCLUDED`
@@ -73,6 +85,15 @@ a new release, skip step 1):
 4. Verify: build with only the `200-*` patches (`--patches <folder with copies of them>`), then
    run the same script against the result. It must print `0 tables differ`.
 5. Update `UPSTREAM.md`.
+
+**Navmeshes change the same way now:** a patch-only release's game-patch zip only contains the
+`runtime/server/navmesh/` files that actually changed (not all 106). Unpack the current set with
+`tools/navmesh-unpack.sh`, overwrite just the changed files from the patch, then
+`tools/navmesh-stage.sh <folder>` as above - it only recompresses files whose hash changed. If
+anything in the set changed, bump the set name (`classic-si-N` -> `classic-si-N+1`) in
+`world/navmesh-manifest.sha256`'s header, `deploy/navmesh-install.sh` (`SET=`) and
+`deploy/release.conf`, even if only one file changed (precedent: 0.36 bumped the set for a
+pockets.json-only change).
 
 ## Upgrading OpenDAoC itself
 

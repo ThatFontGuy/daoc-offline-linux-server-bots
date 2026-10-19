@@ -21,6 +21,15 @@ Policy: **static snapshot, manual pulls.** See docs/ARCHITECTURE.md §9.
   autonomous bot logic (`bots/autonomous/AutonomousArmyPush`, `ZoneRoads`, ...). Not imported: client, launcher, release
   scripts and `tools/`. Sluaghbinder additions (`CripplingPlague`) came along because they are woven into shared enums;
   they stay off via `classes / enable_sluaghbinder = False`.
+- **Synced to v0.37 (`ab4df02`, 2026-10-18).** v0.37, v0.37b and v0.37c are the same commit; the editions differ only
+  in release packaging (0.37c adds the new Godot client), which we don't import. Applied `d88b7b2..ab4df02` with
+  `tools/upstream/sync.sh offlinedaoc apply v0.37b` (74 files; one rejected hunk). Includes guilds for gamebots
+  (`gameutils/Guild.cs`, `GuildMgr.cs`, `bots/autonomous/AutonomousBotGuilds.cs`), bot group travel as one pack
+  (`AutonomousGroupFormationFollow`), further Caer Sidi/Galladoria raid progress, and quest/pathfinding fixes.
+  - `Bots/autonomous/AutonomousPopulationController.cs`: one hunk conflicted with our own bot-login-pacing and
+    `max_active_bots` logic (`bot_logins_per_second`, `LogOutExcessBots`). Hand-merged upstream's `OrphanChecked`
+    cache, the orphan-repair interval (1 -> 10 minutes) and the new guild reconcile/remove hooks; verified against
+    upstream's file afterward (`diff` showed only our own additions remaining).
 - Next pull: `tools/upstream/sync.sh offlinedaoc report|check|apply <tag>` (docs/UPSTREAM-SYNC.md). Our own changes on top are small: `Admin.Host/`,
   `DaocAdmin/`, `Admin.Protocol/`, `WorldBuilder/`, population settings, login handler, console
   host, the csproj files and `Pathing/Detour/CMakeLists.txt`.

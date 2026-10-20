@@ -42,6 +42,11 @@ jobs:
       - name: Package the navmesh archive
         run: tools/package-navmeshes.sh
 
+      - name: Package the Windows client setup helper
+        run: |
+          mkdir -p dist
+          zip -j dist/daoc-windows-client-setup.zip tools/windows-client-setup/Setup-Client.cmd tools/windows-client-setup/setup-client.ps1
+
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
         with:
@@ -50,6 +55,7 @@ jobs:
             dist/daoc-server-*-linux-x64.tar.gz
             dist/daoc-navmeshes-*.tar.xz
             dist/daoc-navmeshes-*.tar.xz.sha256
+            dist/daoc-windows-client-setup.zip
           if-no-files-found: error
 
       - name: Publish GitHub Release
@@ -61,3 +67,4 @@ jobs:
             dist/daoc-server-*-linux-x64.tar.gz
             dist/daoc-navmeshes-*.tar.xz
             dist/daoc-navmeshes-*.tar.xz.sha256
+            dist/daoc-windows-client-setup.zip

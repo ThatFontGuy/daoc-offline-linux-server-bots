@@ -125,12 +125,18 @@ on, run your server from a copy outside `dist/`, and upgrade it as described in
 
 ## Connecting a client
 
-The game client is a separate install (not part of this project). Get it from
-[shadowofze/OfflineDAoC](https://github.com/shadowofze/OfflineDAoC/releases) — download the
-release matching this server's world version (shown in `./daoc-admin status`, currently `0.37`
-or `0.37b` for the Sluaghbinder). Use its downloader to install the client; **don't** use its
-launcher's "START SERVER" button — that starts its own separate local server, not this one.
-Instead, point the client straight at this machine, on port **10300**:
+The game client is a separate install (not part of this project). **Easiest way:** run
+[tools/windows-client-setup/Setup-Client.cmd](tools/windows-client-setup/Setup-Client.cmd) on the
+player's Windows machine — it downloads the official client fresh from shadowofze/OfflineDAoC,
+installs it, and creates a ready-to-go shortcut pointed at a server address it asks for. See
+[GETTING-STARTED.md](GETTING-STARTED.md) for the full walkthrough. Manual steps below if you'd
+rather do it yourself:
+
+Get it from [shadowofze/OfflineDAoC](https://github.com/shadowofze/OfflineDAoC/releases) —
+download the release matching this server's world version (shown in `./daoc-admin status`,
+currently `0.37` or `0.37b` for the Sluaghbinder). Use its downloader to install the client;
+**don't** use its launcher's "START SERVER" button — that starts its own separate local server,
+not this one. Instead, point the client straight at this machine, on port **10300**:
 
 **Windows, the original client (run from inside the installed game folder):**
 ```

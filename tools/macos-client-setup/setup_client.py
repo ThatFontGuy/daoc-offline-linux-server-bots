@@ -14,8 +14,11 @@ each time it runs:
     tree kept (the Windows-only engine and launcher are skipped).
 
 `play` then launches that Godot build on the project, pointed at the server address in
-client.conf (edit that file any time - no need to re-run `install`). The account and password are
-typed into the game's own login screen, not passed on the command line or stored by this tool.
+client.conf (edit that file any time - no need to re-run `install`). `play` prompts for the account
+and password fresh each run (not stored by this tool) and passes them on the command line: passing
+--server= alone makes the client skip its own login screen straight to an auto-login attempt
+(game/login_screen.gd has no field to type into in that mode), so credentials have to come in this
+way, the same as upstream's own launcher and trozzelle's tool do it.
 
 This approach - and the exact pins below - comes from inspecting trozzelle/OfflineDAoC-macOS
 (GPL-3.0), which runs the same official client natively on macOS as part of a larger all-in-one
@@ -26,6 +29,7 @@ project's server already runs separately.
 Usage: double-click Setup-Client.command once, then Play-DAoC.command any time you want to play.
 Or run directly: python3 setup_client.py install | play | status
 """
+import getpass
 import hashlib
 import json
 import os
@@ -41,10 +45,11 @@ from pathlib import Path
 HERE = Path(__file__).resolve().parent
 STATE = HERE / ".state"
 DOWNLOADS = STATE / "downloads"
-GODOT_DIR = STATE / "godot"
+GODOT_DIR = STATE / "Godot.app"
 GODOT_RECORD = GODOT_DIR / ".godot-sha256.txt"
 PROJECT_DIR = STATE / "new-client" / "godot"
 CONF_FILE = HERE / "client.conf"
+CONF_EXAMPLE = HERE / "client.conf.example"
 DOTNET_DIR = Path.home() / ".dotnet"
 
 KEEP = "new-client/godot/"
@@ -327,37 +332,40 @@ def install_content() -> None:
     patch_cache.mkdir(parents=True, exist_ok=True)
     patch_parts = PATCH["parts"]
     patch_json_path = patch_cache / PATCH_JSON
-    todo = [p for p in patch_parts if not (patch_cache / (p["name"] + DONE)).exists()]
-    if todo:
-        say(f"fetching the 0.37c client patch (about {sum(p['bytes'] for p in todo) / 1024 ** 3:.1f} GB "
-            f"in {len(todo)} part(s))")
-    # Download every part first (one of them carries patch.json; which one isn't guaranteed), then
-    # apply them all against the shared patch.json.
-    for i, part in enumerate(patch_parts, 1):
-        zip_path = patch_cache / part["name"]
-        if not (patch_cache / (part["name"] + DONE)).exists() or not zip_path.is_file():
-            say(f"  patch part {i}/{len(patch_parts)}: {part['name']}")
-            download(PATCH["release_url"] + part["name"], zip_path, part["bytes"], part["sha256"])
-        found = read_patch(zip_path, PATCH["root_folder"])
-        if found is not None and not patch_json_path.is_file():
-            patch_json_path.write_text(json.dumps(found))
-    if not patch_json_path.is_file():
-        fail("no patch.json found in any 0.37c client patch part")
-    patch = json.loads(patch_json_path.read_text())
-    for i, part in enumerate(patch_parts, 1):
-        done = patch_cache / (part["name"] + DONE)
-        if done.exists():
-            continue
-        zip_path = patch_cache / part["name"]
-        apply_patch_part(zip_path, PATCH["root_folder"], PROJECT_DIR, patch)
-        zip_path.unlink()
-        done.touch()
-    finish_patch(PROJECT_DIR, patch)
+    # A part whose .done marker exists was already downloaded, verified and applied in a previous
+    # run - its zip is deleted once applied, so it must never be re-fetched just to re-check for
+    # patch.json (the earlier version of this loop did exactly that, wasting ~1.6 GB on every rerun).
+    pending = [p for p in patch_parts if not (patch_cache / (p["name"] + DONE)).exists()]
+    if pending:
+        say(f"fetching the 0.37c client patch (about {sum(p['bytes'] for p in pending) / 1024 ** 3:.1f} GB "
+            f"in {len(pending)} part(s))")
+        # Download every pending part first (one of them carries patch.json; which one isn't
+        # guaranteed), then apply them all against the shared patch.json.
+        for i, part in enumerate(pending, 1):
+            zip_path = patch_cache / part["name"]
+            if not zip_path.is_file():
+                say(f"  patch part {i}/{len(pending)}: {part['name']}")
+                download(PATCH["release_url"] + part["name"], zip_path, part["bytes"], part["sha256"])
+            found = read_patch(zip_path, PATCH["root_folder"])
+            if found is not None and not patch_json_path.is_file():
+                patch_json_path.write_text(json.dumps(found))
+        if not patch_json_path.is_file():
+            fail("no patch.json found in any 0.37c client patch part")
+        patch = json.loads(patch_json_path.read_text())
+        for part in pending:
+            zip_path = patch_cache / part["name"]
+            apply_patch_part(zip_path, PATCH["root_folder"], PROJECT_DIR, patch)
+            zip_path.unlink()
+            (patch_cache / (part["name"] + DONE)).touch()
+        finish_patch(PROJECT_DIR, patch)
     say(f"new client content installed: {PROJECT_DIR}")
 
 
 def cmd_install(_args) -> None:
     STATE.mkdir(parents=True, exist_ok=True)
+    if not CONF_FILE.is_file() and CONF_EXAMPLE.is_file():
+        shutil.copy(CONF_EXAMPLE, CONF_FILE)
+        say(f"created {CONF_FILE.name} from {CONF_EXAMPLE.name} - edit it with your server's address")
     install_godot()
     ensure_dotnet()
     install_content()
@@ -366,7 +374,7 @@ def cmd_install(_args) -> None:
 
 
 def read_conf():
-    host, custom_class_off = None, True
+    host, custom_class_off, account, password = None, True, "", ""
     if CONF_FILE.is_file():
         for line in CONF_FILE.read_text().splitlines():
             line = line.strip()
@@ -378,9 +386,16 @@ def read_conf():
                 host = value
             elif key == "CUSTOM_CLASS":
                 custom_class_off = value.lower() != "on"
+            elif key == "ACCOUNT":
+                account = value
+            elif key == "PASSWORD":
+                password = value
     if not host:
+        if not CONF_FILE.is_file() and CONF_EXAMPLE.is_file():
+            fail(f"no {CONF_FILE.name} yet; run Setup-Client.command first (it creates one from "
+                 f"{CONF_EXAMPLE.name})")
         fail(f"set SERVER_HOST in {CONF_FILE}")
-    return host, custom_class_off
+    return host, custom_class_off, account, password
 
 
 def cmd_play(_args) -> None:
@@ -388,13 +403,26 @@ def cmd_play(_args) -> None:
         fail("Godot is not installed yet; run Setup-Client.command first")
     if not (PROJECT_DIR / "project.godot").is_file():
         fail("the new client is not installed yet; run Setup-Client.command first")
-    host, custom_class_off = read_conf()
-    say(f"launching the new client, connecting to {host}:{NEW_PORT} ...")
+    host, custom_class_off, account, password = read_conf()
+    # --server= alone skips the client's own login screen straight to an auto-login attempt
+    # (game/login_screen.gd: `if Server.active: _server_login()`, with no field to type into) -
+    # account and password must come from the command line, same as the launcher upstream and
+    # trozzelle's tool use. client.conf's ACCOUNT/PASSWORD are used if set (plaintext, like the
+    # Windows CONNECT TO SERVER.cmd); left blank, they're prompted for fresh each run instead.
+    if not account:
+        account = input("Account name (letters/numbers only - created on first login): ").strip()
+    if not account:
+        fail("an account name is required")
+    if not password:
+        password = getpass.getpass("Password: ")
+    if not password:
+        fail("a password is required")
+    say(f"launching the new client, connecting to {host}:{NEW_PORT} as {account} ...")
     argv = [
         "/usr/bin/open", "-n", str(GODOT_DIR),
         "--env", f"DOTNET_ROOT={DOTNET_DIR}",
         "--args", "--path", str(PROJECT_DIR), "--",
-        f"--server={host}",
+        f"--server={host}", f"--account={account}", f"--password={password}",
     ]
     if custom_class_off:
         argv.append("--custom-class=off")
@@ -405,8 +433,9 @@ def cmd_status(_args) -> None:
     say(f"Godot installed: {(GODOT_DIR / 'Contents' / 'MacOS').is_dir()}")
     say(f"New client installed: {(PROJECT_DIR / 'project.godot').is_file()}")
     if CONF_FILE.is_file():
-        host, custom_class_off = read_conf()
-        say(f"client.conf: SERVER_HOST={host} CUSTOM_CLASS={'off' if custom_class_off else 'on'}")
+        host, custom_class_off, account, password = read_conf()
+        say(f"client.conf: SERVER_HOST={host} CUSTOM_CLASS={'off' if custom_class_off else 'on'} "
+            f"ACCOUNT={account or '(prompted)'} PASSWORD={'(set)' if password else '(prompted)'}")
 
 
 def main() -> None:

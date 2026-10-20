@@ -29,3 +29,8 @@ src/Pathing/Detour/build/
 src/build/
 dist/
 .cache/
+
+# macOS client setup: downloaded Godot engine + ~34 GB of game content, never committed
+tools/macos-client-setup/.state/
+# macOS client setup: your real server address and (optionally) account/password
+tools/macos-client-setup/client.conf

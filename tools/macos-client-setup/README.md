@@ -21,15 +21,25 @@ It does **not** install or run a server - point `client.conf` at a server that's
 
 1. Double-click `Setup-Client.command`. It downloads about 34 GB in parts (resumable - if it
    stops, just run it again; already-verified parts are kept). Needs about 36 GB free disk space
-   while it installs.
+   while it installs. On first run it also creates `client.conf` from the tracked
+   `client.conf.example` template - `client.conf` itself is gitignored (it can end up holding your
+   real server address and, optionally, a plaintext account/password), so it's never committed.
 2. Edit `client.conf`: set `SERVER_HOST` to your server's address (a LAN IP works if you're on the
    same network; an external hostname works too, once you've port-forwarded TCP 10300 and UDP
    10400 on your router to the server).
-3. Double-click `Play-DAoC.command` any time you want to play. Type your account name and password
-   into the game's own login screen - this tool never asks for or stores them.
+3. Double-click `Play-DAoC.command` any time you want to play. It needs an account name and
+   password to pass to the client (with `--server=` set, the client skips its own login screen
+   straight to an auto-login attempt, so there's no in-game field to type into). Either set
+   `ACCOUNT`/`PASSWORD` in `client.conf` (plaintext, easiest to double-check for typos), or leave
+   them blank there to be prompted for both in the terminal each run instead. Accounts are created
+   automatically on first login.
 
 ## Notes
 
+- **Your password is briefly visible to other local users on this Mac** while the client is
+  running (`ps`/Activity Monitor can see a launched process's own arguments) - the client only
+  accepts credentials this way when `--server=` is set, same as upstream's own launcher and
+  trozzelle/OfflineDAoC-macOS do it. Fine for a personal machine; worth knowing on a shared one.
 - `CUSTOM_CLASS` in `client.conf` controls whether the Sluaghbinder shows up at character
   creation; it should match whether your server enables it
   (`classes / enable_sluaghbinder` in `serverconfig.xml`). Picking a class the server doesn't

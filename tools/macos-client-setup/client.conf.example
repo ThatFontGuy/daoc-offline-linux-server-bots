@@ -4,9 +4,16 @@
 # and UDP 10400 on your router to your TrueNAS box, whatever). Play-DAoC.command reads this file
 # fresh on every launch - no need to re-run Setup-Client.command after changing it.
 
-SERVER_HOST=192.168.1.69
+SERVER_HOST=192.168.1.X
 
 # CUSTOM_CLASS=off hides the Sluaghbinder in character creation, matching a server that runs with
 # classes/enable_sluaghbinder = False (the classic-only edition - see docs/ARCHITECTURE.md in the
 # server repo). Set to "on" only if your server enables the Sluaghbinder.
 CUSTOM_CLASS=off
+
+# Optional: set ACCOUNT/PASSWORD here to skip the prompt Play-DAoC.command otherwise asks for each
+# run (plaintext, same tradeoff as the Windows CONNECT TO SERVER.cmd file). Leave both blank to be
+# prompted instead - nothing is stored anywhere in that case.
+ACCOUNT=
+PASSWORD=
+

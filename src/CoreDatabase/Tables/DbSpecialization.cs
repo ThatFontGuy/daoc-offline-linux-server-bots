@@ -14,6 +14,7 @@ namespace DOL.Database
 		protected string m_description = "no description";
 		protected ushort m_icon = 0;
 		protected string m_implementation;
+		protected byte m_clientStyleGroup = 0;
 		
 		/// <summary>
 		/// Constructor
@@ -90,6 +91,24 @@ namespace DOL.Database
 		public string Implementation {
 			get { return m_implementation; }
 			set { Dirty = true; m_implementation = value; }
+		}
+
+		/// <summary>
+		/// Overrides which client-side style-category/icon group this specialization's styles
+		/// are grouped under (see GlobalConstants.GetSpecToInternalIndex) - 0 (the default) means
+		/// "no override, use the built-in table of real DAoC spec names". The client only
+		/// recognizes that fixed, hardcoded set of names for this grouping, so any custom
+		/// specialization (e.g. one created by cloning an existing spec) needs this set to an
+		/// existing recognized value - usually whatever its clone source already resolves to -
+		/// or its styles show up lumped under the client's generic "Abilities" bucket instead of
+		/// their own spec's name/icon. Purely cosmetic: does not affect training, points, or
+		/// style usability at all.
+		/// </summary>
+		[DataElement(AllowDbNull=false)]
+		public byte ClientStyleGroup
+		{
+			get { return m_clientStyleGroup; }
+			set { Dirty = true; m_clientStyleGroup = value; }
 		}
 		
 		/// <summary>

@@ -800,6 +800,10 @@ namespace DOL.GS
 
 		public static byte GetSpecToInternalIndex(string name)
 		{
+			byte styleGroupOverride = SkillBase.GetStyleGroupOverride(name);
+			if (styleGroupOverride != 0)
+				return styleGroupOverride;
+
 			switch (name)
 			{
 					case Specs.Slash: return 0x01;

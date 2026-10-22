@@ -37,6 +37,10 @@ namespace DOL.GS
 		// Specialization dict KeyName => Spec Tuple to instantiate.
 		protected static readonly Dictionary<string, Tuple<Type, string, ushort, int>> m_specsByName = new();
 
+		// Specialization KeyName => ClientStyleGroup override (only populated for specs that set
+		// a non-zero value - see DbSpecialization.ClientStyleGroup and GetStyleGroupOverride).
+		protected static readonly Dictionary<string, byte> m_specsStyleGroupOverride = new();
+
 		// Specialization X SpellLines Dict<"string spec keyname", "List<"Tuple<"SpellLine line", "int classid"> line constraint"> list of lines">
 		protected static readonly Dictionary<string, List<Tuple<SpellLine, int>>> m_specsSpellLines = new();
 
@@ -507,6 +511,9 @@ namespace DOL.GS
 					// Clear Spec Cache
 					m_specsByName.Clear();
 
+					// Clear ClientStyleGroup override cache
+					m_specsStyleGroupOverride.Clear();
+
 					// Clear SpecXAbility Cache (Ability Career)
 					m_specsAbilities.Clear();
 
@@ -538,6 +545,9 @@ namespace DOL.GS
 							log.Debug($"Specialization {spec.KeyName} successfully instantiated from {gameSpec.GetType().FullName} (expected {spec.Implementation})");
 
 						Tuple<Type, string, ushort, int> entry = new(gameSpec.GetType(), spec.Name, spec.Icon, spec.SpecializationID);
+
+						if (spec.ClientStyleGroup != 0)
+							m_specsStyleGroupOverride[spec.KeyName] = spec.ClientStyleGroup;
 
 						// Now we have an instanciated Specialization, Cache their properties in Skillbase to prevent using too much memory
 						// As most skill objects are duplicated for every game object use...
@@ -2631,6 +2641,28 @@ namespace DOL.GS
 			}
 
 			return null;
+		}
+
+		/// <summary>
+		/// Gets a specialization's DbSpecialization.ClientStyleGroup override, if it set one -
+		/// used by GlobalConstants.GetSpecToInternalIndex so a custom specialization's styles can
+		/// be grouped under an existing client-recognized category instead of always falling
+		/// back to the generic "Abilities" bucket the client shows for any unrecognized spec name.
+		/// </summary>
+		/// <param name="keyname">The specialization's KeyName.</param>
+		/// <returns>The override value, or 0 if this spec doesn't set one.</returns>
+		public static byte GetStyleGroupOverride(string keyname)
+		{
+			m_syncLockUpdates.EnterReadLock();
+
+			try
+			{
+				return m_specsStyleGroupOverride.GetValueOrDefault(keyname, (byte)0);
+			}
+			finally
+			{
+				m_syncLockUpdates.ExitReadLock();
+			}
 		}
 
 		public static List<Specialization> GetSpecializationByType(Type type)
